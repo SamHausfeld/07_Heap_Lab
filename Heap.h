@@ -65,8 +65,8 @@ template<class Pri, class T>
 void Heap<Pri, T>::grow(){
 
 	// does this even?
-
-	std::pair<Pri, T>* biggerBackingArray;
+	// wait...do I ever set the size of this bigger array?
+	std::pair<Pri, T>* biggerBackingArray = new std::pair<Pri,T>[2*arrSize];
 	for (int k = 0; k < numItems; k++) {
 		biggerBackingArray[k] = backingArray[k%arrSize];
 	}
@@ -99,24 +99,35 @@ void Heap<Pri, T>::bubbleUp(unsigned long index){
 
 template<class Pri, class T>
 void Heap<Pri, T>::trickleDown(unsigned long index){
+	
+	int i = index;
+	
 	do{
 		// Decide j.
 		int j = -1;
-		int rdex = right(index);
-		int ldex = left(index);
-		if (rdex < numItems && backingArray[index].first < backingArray[rdex].first) { // R is smaller than index.
+		int rdex = right(i);
+		
+
+		if ((rdex < numItems) && (backingArray[rdex].first < backingArray[i].first)) { // R is smaller than index.
+			int ldex = left(index);
 			if (backingArray[ldex].first < backingArray[rdex].first) // L is smaller than R.
 				j = ldex;
-			else j = rdex;
+			else {
+				j = rdex;
+			}
 		}else {
-			if (ldex < numItems && backingArray[index].first < backingArray[ldex].first) // R is bigger than index, but L is smaller.
+			int ldex = left(i);
+			if ((ldex < numItems) && (backingArray[ldex].first < backingArray[i].first)) // R is bigger than index, but L is smaller.
 				j = ldex;
 		}
+
 		// Swap'em
 		if (j >= 0)
-			backingArray[index].swap(backingArray[j]);
+			backingArray[i].swap(backingArray[j]);
 
-	} while (index <= 0);
+		i = j;
+
+	} while (i <= 0);
 			
 		// Is there a way to do this recursively?? I experimented a bit but kept running into roadblocks.
 }
@@ -124,17 +135,19 @@ void Heap<Pri, T>::trickleDown(unsigned long index){
 
 template<class Pri, class T>
 std::pair<Pri, T> Heap<Pri, T>::remove(){
+
+	if (numItems == 0) throw std::string("Can't remove what's not there!");
+
 	std::pair<Pri, T> tmp = backingArray[0]; // store the root
-	numItems--;
-	backingArray[0] = backingArray[numItems]; // replace the root
+	backingArray[0] = backingArray[(numItems-1)]; // replace the root
 	trickleDown(0); // bubble down that replacement back to where it came from
+	numItems--;
 	return tmp; // return the old root
 }
 
 template<class Pri, class T>
 unsigned long Heap<Pri, T>::getNumItems(){
 	return numItems;
-	// that's it????
 }
 
 
