@@ -70,6 +70,7 @@ void Heap<Pri, T>::grow(){
 	for (int k = 0; k < numItems; k++) {
 		biggerBackingArray[k] = backingArray[k%arrSize];
 	}
+	arrSize *= 2;
 	backingArray = biggerBackingArray;
 }
 
@@ -83,15 +84,24 @@ void Heap<Pri, T>::add(std::pair<Pri, T> toAdd){
 
 template<class Pri, class T>
 void Heap<Pri, T>::bubbleUp(unsigned long index){
-	if (index <= 0) return;
+	
 	int pdex = parent(index);
-	if (backingArray[index].first <= backingArray[pdex].first) {
-		// We include .first because we are dealing with heaps after all
-		return;
-		std::cout << "Bubbled up!" << std::endl;
+
+	if (backingArray[pdex].first > backingArray[index].first && index > 0) {
+		backingArray[pdex].swap(backingArray[index]);
+		index = pdex;
+		bubbleUp(pdex); // Classy.
 	}
-	backingArray[pdex].swap(backingArray[index]);
-	bubbleUp(pdex); // Classy.
+	
+	//if (index <= 0) return;
+	//int pdex = parent(index);
+	//if (backingArray[index].first <= backingArray[pdex].first) {
+	//	// We include .first because we are dealing with heaps after all
+	//	return;
+	//	std::cout << "Bubbled up!" << std::endl;
+	//}
+	//backingArray[pdex].swap(backingArray[index]);
+	//bubbleUp(pdex); // Classy.
 
 	
 
