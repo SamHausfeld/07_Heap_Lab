@@ -68,9 +68,12 @@ void Heap<Pri, T>::grow(){
 	// wait...do I ever set the size of this bigger array?
 	std::pair<Pri, T>* biggerBackingArray = new std::pair<Pri,T>[2*arrSize];
 	for (int k = 0; k < numItems; k++) {
-		biggerBackingArray[k] = backingArray[k%arrSize];
+		biggerBackingArray[k] = backingArray[k];
+		// originally had: biggerBackingArray[k] = backingArray[k%arrSize];
+		// this isn't a circular array.
 	}
 	arrSize *= 2;
+	delete[] backingArray; // avoid memory leakage
 	backingArray = biggerBackingArray;
 }
 
@@ -137,9 +140,11 @@ void Heap<Pri, T>::trickleDown(unsigned long index){
 
 		i = j;
 
-	} while (i <= 0);
+	} while (i >= 0);
 			
 		// Is there a way to do this recursively?? I experimented a bit but kept running into roadblocks.
+		// Brinkman responded: Yes, although the loop method is probably preferable because
+		// it is the exact same logic, but doesn't require func. calls
 }
 
 
@@ -150,8 +155,8 @@ std::pair<Pri, T> Heap<Pri, T>::remove(){
 
 	std::pair<Pri, T> tmp = backingArray[0]; // store the root
 	backingArray[0] = backingArray[(numItems-1)]; // replace the root
-	trickleDown(0); // bubble down that replacement back to where it came from
 	numItems--;
+	trickleDown(0); // bubble down that replacement back to where it came from
 	return tmp; // return the old root
 }
 
